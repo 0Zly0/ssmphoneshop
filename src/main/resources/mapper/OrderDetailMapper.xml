@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oracle.ssmphone.mapper.OrderDetailMapper">
+    <resultMap id="orderDetailMap" type="OrderDetail">
+        <id property="detailId" column="detail_id" javaType="java.lang.Integer"/>
+        <result property="detailPrice" column="detail_price" javaType="java.lang.Double"/>
+        <result property="detailNum" column="detail_num" javaType="java.lang.Integer"/>
+        <!--查询订单编号-->
+        <result property="detailOrder.orderId" column="detail_order_id" javaType="java.lang.String"/>
+        <!--对多一关联商品明细 detailGoodsDetail:根据在订单明细中查询的商品明细编号查询商品-->
+        <association property="detailGoodsDetail"
+
+                     select="com.oracle.ssmphone.mapper.GoodsDetailMapper.get" column="detail_goods_detail_id"/>
+    </resultMap>
+    <delete id="delByOrderId">
+        delete from order_details where detail_order_id = #{orderId}
+    </delete>
+    <!--根据订单编号查询订单明细集合-->
+    <select id="findByOrderId" resultMap="orderDetailMap">
+        SELECT *
+        FROM order_details
+        WHERE detail_order_id = #{orderId}
+    </select>
+    <select id="getGoodsIdByOrderId" resultType="java.lang.Integer">
+        select detail_goods_detail_id from order_details where detail_order_id = #{orderId}
+    </select>
+    <!--orderDetailList-->
+    <insert id="save">
+        insert into order_details(detail_order_id, detail_goods_detail_id, detail_num, detail_price)
+        values
+        <foreach collection="orderDetailList" item="od" separator=",">
+            (#{od.detailOrder.orderId}, #{od.detailGoodsDetail.gdId}, #{od.detailNum}, #{od.detailPrice})
+        </foreach>
+    </insert>
+</mapper>

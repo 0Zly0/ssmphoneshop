@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oracle.ssmphone.mapper.ReciMapper">
+    <resultMap id="reciMap" type="Reci">
+        <id property="reciId" column="recipients_id" javaType="java.lang.Integer"/>
+        <result property="reciName" column="recipients_name" javaType="java.lang.String"/>
+        <result property="reciAddr" column="recipients_address" javaType="java.lang.String"/>
+        <result property="reciPhone" column="recipients_phone" javaType="java.lang.String"/>
+        <result property="reciChecked" column="recipients_checked" javaType="java.lang.Integer"/>
+        <result property="reciUser.userId" column="recipients_user_id" javaType="java.lang.Integer"/>
+    </resultMap>
+
+    <insert id="save">
+        insert into order_recipients (recipients_name, recipients_address, recipients_phone, recipients_user_id)
+        values (#{reciName}, #{reciAddr}, #{reciPhone}, #{reciUser.userId})
+    </insert>
+    <update id="updateReciAddr">
+        update order_recipients set recipients_name = #{reciName},recipients_address = #{reciAddr},
+                                    recipients_phone = #{reciPhone} where recipients_id = #{reciId}
+    </update>
+    <select id="findByUser" resultMap="reciMap">
+        SELECT *
+        FROM order_recipients
+        WHERE recipients_user_id = #{userId}
+    </select>
+    <select id="get" resultMap="reciMap">
+        select *
+        from order_recipients
+        where recipients_id = #{reciId}
+    </select>
+</mapper>

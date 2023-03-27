@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间(namespace指向Mapper接口)-->
+<mapper namespace="com.oracle.ssmphone.mapper.FunMapper">
+    <select id="showFuns" resultType="Funs">
+        select *
+        from funs
+        <where>
+            <if test="funName!=null and funName!=''">
+                and fun_name like concat('%',#{funName},'%')
+            </if>
+            <if test="funTarget!=null and funTarget!=''">
+                and fun_target =#{funTarget}
+            </if>
+            <if test="funLevel!=null">
+                and fun_level =#{funLevel}
+            </if>
+        </where>
+        order by fun_sort
+    </select>
+    <delete id="delete">
+        delete
+        from funs
+        where fun_id = #{funId}
+    </delete>
+    <insert id="save">
+        INSERT INTO funs (fun_name, fun_url, fun_pid, fun_target, fun_sort, fun_level)
+        VALUES (#{funName}, #{funUrl}, #{funPid}, #{funTarget}, #{funSort}, #{funLevel})
+    </insert>
+    <select id="findFunByLevel" resultType="Funs">
+        SELECT *
+        FROM funs
+        WHERE fun_level = #{funLevel}
+        order by fun_sort
+    </select>
+    <select id="findFunByPid" resultType="Funs">
+        SELECT *
+        FROM funs
+        WHERE fun_pid = #{funPid}
+        order by fun_sort
+    </select>
+    <delete id="deleteByPid">
+        delete
+        FROM funs
+        WHERE fun_pid = #{pid}
+    </delete>
+    <select id="get" resultType="Funs">
+        SELECT *
+        FROM funs
+        WHERE fun_id = #{funId}
+    </select>
+    <update id="update">
+        update funs
+        set fun_name=#{funName},
+            fun_url=#{funUrl},
+            fun_pid=#{funPid},
+            fun_target=#{funTarget},
+            fun_sort=#{funSort},
+            fun_level=#{funLevel}
+        where fun_id = #{funId}
+    </update>
+</mapper>

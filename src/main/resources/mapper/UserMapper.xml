@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间(namespace指向Mapper接口)-->
+<mapper namespace="com.oracle.ssmphone.mapper.UserMapper">
+
+    <resultMap id="userMap" type="User">
+        <result property="userId" column="user_id" javaType="java.lang.Integer"/>
+        <result property="userName" column="user_name" javaType="java.lang.String"/>
+        <result property="userPass" column="user_pass" javaType="java.lang.String"/>
+        <result property="userPhone" column="user_phone" javaType="java.lang.String"/>
+    </resultMap>
+
+    <!--注册find方法-->
+    <!--id对应find方法,resultType对应查询结果要封装的实体类-->
+    <select id="find" resultType="User">
+        select *
+        from users
+    </select>
+    <!--一个参数传递:#{userId}对应get中参数名-->
+    <select id="get" resultType="User">
+        select *
+        from users
+        where user_id = #{userId}
+    </select>
+    <!--一个参数传递:#{name}对应@Param中参数名一致-->
+    <select id="findByNameAndPwd" resultType="User">
+        select *
+        from users
+        where user_name = #{name}
+          and user_pass = #{pwd}
+    </select>
+    <!--添加  userName、userPass、userPhone对应参数User的属性-->
+    <insert id="save">
+        insert into users (user_name, user_pass, user_phone)
+        values (#{userName}, #{userPass}, #{userPhone})
+    </insert>
+    <delete id="delete">
+        delete
+        from users
+        where user_id = #{userId}
+    </delete>
+    <update id="update">
+        UPDATE users
+        SET user_name=#{userName},
+            user_pass=#{userPass},
+            user_phone=#{userPhone}
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间(namespace指向Mapper接口)-->
+<mapper namespace="com.oracle.ssmphone.mapper.ItemsMapper">
+    <resultMap id="itemMap" type="Items">
+        <id property="itemId" column="item_id" javaType="java.lang.Integer"/>
+        <result property="itemNum" column="item_num" javaType="java.lang.Integer"/>
+        <result property="itemUser.userId" column="item_user_id" javaType="java.lang.Integer"/>
+        <!--延迟加载商品明细-->
+        <association property="itemGoodsDetail" select="com.oracle.ssmphone.mapper.GoodsDetailMapper.get"
+                     column="item_goods_detail_id"/>
+    </resultMap>
+    <delete id="deleteByUser">
+        delete
+        from shop_item
+        where item_user_id = #{userId}
+    </delete>
+    <delete id="delete">
+        delete
+        from shop_item
+        where item_id = #{itemId}
+    </delete>
+    <insert id="addItems">
+        insert into shop_item(item_goods_detail_id, item_num, item_user_id)
+        values (#{itemGoodsDetail.gdId}, #{itemNum}, #{itemUser.userId})
+    </insert>
+    <update id="updateNum">
+        update shop_item
+        set item_num=#{itemNum}
+        where item_goods_detail_id = #{itemGoodsDetail.gdId}
+          and item_user_id = #{itemUser.userId}
+    </update>
+    <delete id="deleteDetach">
+        delete from shop_item where item_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="findItems" resultType="Items">
+        select *
+        from shop_item
+        where item_user_id = #{itemUser.userId}
+          and item_goods_detail_id = #{itemGoodsDetail.gdId}
+    </select>
+    <select id="findByUser" resultMap="itemMap">
+        select *
+        from shop_item
+        where item_user_id = #{userId}
+    </select>
+</mapper>

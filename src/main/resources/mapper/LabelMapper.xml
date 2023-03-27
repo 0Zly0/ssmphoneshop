@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oracle.ssmphone.mapper.LabelMapper">
+    <cache/>
+    <resultMap id="labelMap" type="Labels">
+        <id property="labelId" column="label_id" javaType="java.lang.Integer"/>
+        <result property="labelName" column="label_name" javaType="java.lang.String"/>
+    </resultMap>
+    <select id="find" resultMap="labelMap">
+        select *
+        from labels l
+        order by l.label_id
+    </select>
+    <!--对该方法不开启二级缓存-->
+    <select id="findByGoodsId" resultMap="labelMap" useCache="false">
+        SELECT DISTINCT l.*
+        FROM goods_label gl
+                 LEFT JOIN labels l
+                           ON gl.gl_label_id = l.label_id
+        WHERE gl.gl_goods_id = #{goodsId}
+    </select>
+</mapper>

@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间(namespace指向Mapper接口)-->
+<mapper namespace="com.oracle.ssmphone.mapper.OrderMapper">
+    <resultMap id="orderMap" type="Orders">
+        <id property="orderId" column="order_id" javaType="java.lang.String"/>
+        <result property="orderAddr" column="order_address" javaType="java.lang.String"/>
+        <result property="orderPhone" column="order_phone" javaType="java.lang.String"/>
+        <result property="orderName" column="order_name" javaType="java.lang.String"/>
+        <result property="orderPrice" column="order_price" javaType="java.lang.Double"/>
+        <result property="orderTime" column="order_time" javaType="java.sql.Timestamp"/>
+        <!--多对一关联订单用户  -->
+        <association property="orderUser" javaType="User" resultMap="com.oracle.ssmphone.mapper.UserMapper.userMap"/>
+        <!--多对一关联状态-->
+        <association property="orderStatus" javaType="OrderStatus"
+                     resultMap="com.oracle.ssmphone.mapper.OrderStatusMapper.orderStatusMap"/>
+    </resultMap>
+    <insert id="save">
+        insert into orders
+        values (#{orderId}, #{orderUser.userId}, now(), #{orderName}, #{orderPhone}, #{orderAddr}, #{orderPrice}, 1)
+    </insert>
+    <delete id="delByOrderId">
+        delete from orders where order_id = #{orderId}
+    </delete>
+
+
+    <!--根据订单号查询订单(关联用户和状态)-->
+    <select id="get" resultMap="orderMap">
+        SELECT o.*, u.*, s.*
+        FROM orders o
+                 LEFT JOIN users u ON o.order_user_id = u.user_id
+                 LEFT JOIN order_status s ON o.order_status_id = s.status_id
+        where o.order_id = #{orderId}
+    </select>
+    <!--根据订单状态查询订单，关联订单用户和订单状态-->
+    <select id="findOrderByStatusId" resultMap="orderMap">
+        SELECT o.*, u.*, s.*
+        FROM orders o
+        LEFT JOIN users u ON o.order_user_id = u.user_id
+        LEFT JOIN order_status s ON o.order_status_id = s.status_id
+        <where>
+            <if test="statusId!=null">
+                and s.status_id = #{statusId}
+            </if>
+            <if test="order.orderId!=null and order.orderId!=''">
+                and order_id like concat('%',#{order.orderId},'%')
+            </if>
+            <if test="order.orderUser!=null and order.orderUser.userName!='' and  order.orderUser.userName!=null">
+                and u.user_name =#{order.orderUser.userName}
+            </if>
+            <if test="order.orderName!=null and order.orderName!=''">
+                and order_name =#{order.orderName}
+            </if>
+            <if test="order.orderPhone!=null and order.orderPhone!=''">
+                and order_phone =#{order.orderPhone}
+            </if>
+        </where>
+        order by o.order_user_id ,o.order_time desc
+    </select>
+
+    <update id="updateStatus">
+        update orders
+        set order_status_id=#{statusId}
+        where order_id = #{orderId}
+    </update>
+    <select id="findOrderByUser" resultMap="orderMap">
+        SELECT o.*, u.*, s.*
+        FROM orders o
+                 LEFT JOIN users u ON o.order_user_id = u.user_id
+                 LEFT JOIN order_status s ON o.order_status_id = s.status_id
+        where o.order_user_id = #{userId}
+        order by o.order_status_id
+    </select>
+</mapper>

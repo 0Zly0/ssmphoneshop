@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- 通过这个配置文件完成mybatis与数据库的连接 -->
+<configuration>
+    <settings>
+        <!-- 配置mybatis的log实现为LOG4J -->
+        <setting name="logImpl" value="LOG4J"/>
+        <!--启用驼峰转换-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--开启懒加载-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!--禁止立即加载-->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <!-- 开启二级缓存 -->
+        <setting name="cacheEnabled" value="true" />
+
+    </settings>
+    <typeAliases>
+       <!--告诉mybatis实体类所在的包:优点是在映射文件中可以直接写实体类名-->
+       <package name="com.oracle.ssmphone.domain"/>
+    </typeAliases>
+    <!--配置分页插件：注意位置-->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <property name="helperDialect" value="mysql"/>
+            <property name="pageSizeZero" value="true"/>
+        </plugin>
+    </plugins>
+</configuration>

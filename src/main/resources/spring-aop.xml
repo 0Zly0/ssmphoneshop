@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--事务管理器-->
+    <bean id="tm" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--ds在spring.xml中配置-->
+        <property name="dataSource" ref="ds"/>
+    </bean>
+    <!--事务增强-->
+    <tx:advice id="trAdvice" transaction-manager="tm">
+        <tx:attributes>
+            <!--show开头的方法  事务传播:SUPPORTS 支持当前事务-->
+            <tx:method name="show*" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="login" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="details*" propagation="SUPPORTS" read-only="true"/>
+            <!--其余方法-->
+            <tx:method name="*" rollback-for="Exception"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config>
+        <!--加增强的方法:切入点-->
+        <aop:pointcut id="pc" expression="execution(public * com.oracle.ssmphone.service.*.*(..))"/>
+        <!--把增强与切入点结合-->
+        <aop:advisor advice-ref="trAdvice" pointcut-ref="pc"/>
+    </aop:config>
+
+
+</beans>

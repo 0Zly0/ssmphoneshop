@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oracle.ssmphone.mapper.GoodsImgMapper">
+    <resultMap id="goodsImgMap" type="GoodsImg">
+        <id column="memory_id" property="imgId" javaType="java.lang.Integer"/>
+        <result column="img_big" property="imgBig" javaType="java.lang.String"/>
+        <result column="img_small" property="imgSmall" javaType="java.lang.String"/>
+    </resultMap>
+
+    <select id="findByGoodsId" resultMap="goodsImgMap">
+        SELECT *
+        FROM goods_img gi
+        WHERE gi.img_goods_id = #{goodsId}
+    </select>
+
+</mapper>

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间(namespace指向Mapper接口)-->
+<mapper namespace="com.oracle.ssmphone.mapper.AdminMapper">
+    <!--实体属性与表中字段对应-->
+    <resultMap id="adminMap" type="Admin">
+        <result property="adminId" javaType="java.lang.Integer" column="admin_id"/>
+        <result property="adminName" javaType="java.lang.String" column="admin_name"/>
+        <result property="adminPass" javaType="java.lang.String" column="admin_pass"/>
+    </resultMap>
+    <!--resultType与resultMap配置二选一-->
+<select id="findByNameAndPwd" resultMap="adminMap">
+    SELECT * FROM admins WHERE admin_name=#{name} AND admin_pass=#{pwd}
+</select>
+</mapper>

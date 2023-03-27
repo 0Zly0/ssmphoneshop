@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间(namespace指向Mapper接口)-->
+<mapper namespace="com.oracle.ssmphone.mapper.OrderStatusMapper">
+   <resultMap id="orderStatusMap" type="OrderStatus">
+       <result property="statusId" column="status_id" javaType="java.lang.Integer"/>
+       <result property="statusName" column="status_name" javaType="java.lang.String"/>
+   </resultMap>
+</mapper>

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间(namespace指向Mapper接口)-->
+<mapper namespace="com.oracle.ssmphone.mapper.BrandMapper">
+    <cache/>
+    <resultMap id="brandMap" type="Brands">
+        <result property="brandId" javaType="java.lang.Integer" column="brand_id"/>
+        <result property="brandName" javaType="java.lang.String" column="brand_name"/>
+    </resultMap>
+
+    <select id="find" resultType="Brands" >
+        select *  from brands
+        <where>
+            <if test="brandName!=null and brandName!=''">
+                and brand_name like concat('%',#{brandName},'%')
+            </if>
+        </where>
+        order by brand_id
+    </select>
+    <delete id="delete">
+        delete  from brands  WHERE brand_id = #{brandId}
+    </delete>
+    <insert id="save">
+        INSERT INTO brands (brand_name) VALUES (#{brandName})
+    </insert>
+    <select id="get" resultType="Brands">
+        SELECT *    FROM brands   WHERE brand_id = #{brandId}
+    </select>
+    <update id="update">
+        update brands    set brand_name=#{brandName}    WHERE brand_id = #{brandId}
+    </update>
+</mapper>

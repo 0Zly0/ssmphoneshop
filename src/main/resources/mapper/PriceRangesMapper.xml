@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间(namespace指向Mapper接口)-->
+<mapper namespace="com.oracle.ssmphone.mapper.PriceRangesMapper">
+    <cache/>
+    <select id="find" resultType="PriceRanges">
+        select *
+        from price_range
+    </select>
+    <select id="get" resultType="PriceRanges">
+        select *
+        from price_range
+        where pr_id = #{prId}
+    </select>
+</mapper>

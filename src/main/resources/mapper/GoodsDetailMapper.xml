@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oracle.ssmphone.mapper.GoodsDetailMapper">
+    <resultMap id="goodsDetailMap" type="GoodsDetail">
+        <id column="gd_id" property="gdId" javaType="java.lang.Integer"/>
+        <result column="gd_price" property="gdPrice" javaType="java.lang.Double"/>
+        <result column="gd_num" property="gdNum" javaType="java.lang.Integer"/>
+        <!--关联配置gdGoods-->
+        <association property="gdGoods" resultMap="com.oracle.ssmphone.mapper.GoodsMapper.goodsMap"/>
+        <!--关联配置gdColor-->
+        <association property="gdColor" resultMap="com.oracle.ssmphone.mapper.ColorMapper.colorMap"/>
+        <!--关联配置gdMemory-->
+        <association property="gdMemory" resultMap="com.oracle.ssmphone.mapper.MemoryMapper.memoryMap"/>
+    </resultMap>
+
+    <select id="getGdId" resultType="java.lang.Integer">
+        select gd_id
+        from goods_detail
+        where gd_color_id = #{gdColor.colorId}
+          and gd_memory_id = #{gdMemory.memoryId}
+          and gd_goods_id = #{gdGoods.goodsId}
+    </select>
+
+
+    <!--根据明细编号查询商品明细(关联内存和颜色)-->
+    <select id="get" resultMap="goodsDetailMap">
+        SELECT gd.*, g.*, color.*, m.*
+        FROM goods_detail gd
+                 LEFT JOIN goods g ON gd.gd_goods_id = g.goods_id
+                 LEFT JOIN sku_color color ON color.color_id = gd.gd_color_id
+                 LEFT JOIN sku_memory m ON gd.gd_memory_id = m.memory_id
+        WHERE gd_id = #{gdId}
+    </select>
+    <select id="getNum" resultType="java.lang.Integer">
+        select gd_num from goods_detail where gd_id = #{gdId}
+    </select>
+    <update id="update">
+        update goods_detail
+        <set>
+            <if test="gdGoods!=null and gdGoods.goodsId!=null">
+                gd_goods_id=#{gdGoods.goodsId},
+            </if>
+            <if test="gdColor!=null and gdColor.colorId!=null">
+                gd_color_id=#{gdColor.colorId},
+            </if>
+            <if test="gdMemory!=null and gdMemory.memoryId!=null">
+                gd_memory_id=#{gdMemory.memoryId},
+            </if>
+            <if test="gdPrice!=null">
+                gd_price=#{gdPrice},
+            </if>
+            <if test="gdNum!=null">
+                gd_num=#{gdNum},
+            </if>
+        </set>
+        where gd_id=#{gdId}
+    </update>
+    <update id="updateGdNum">
+        update goods_detail set gd_num = #{num} + 1 where gd_id = #{gdId}
+    </update>
+</mapper>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oracle.ssmphone.mapper.GoodsMapper">
+    <resultMap id="goodsMap" type="Goods">
+        <id property="goodsId" column="goods_id" javaType="java.lang.Integer"/>
+        <result property="goodsName" column="goods_name" javaType="java.lang.String"/>
+        <result property="goodsPrice" column="goods_price" javaType="java.lang.Double"/>
+        <result property="goodsImg" column="goods_img" javaType="java.lang.String"/>
+        <result property="goodsIntr" column="goods_intr" javaType="java.lang.String"/>
+        <result property="goodsDesc" column="goods_desc" javaType="java.lang.String"/>
+        <result property="goodsSpec" column="goods_spec" javaType="java.lang.String"/>
+        <result property="goodsPack" column="goods_pack" javaType="java.lang.String"/>
+        <result property="goodsServ" column="goods_serv" javaType="java.lang.String"/>
+        <result property="goodsEval" column="goods_eval" javaType="java.lang.Integer"/>
+        <result property="goodsNum" column="goods_num" javaType="java.lang.Integer"/>
+        <!--多对一关联类别-->
+        <association property="goodsBrand" resultMap="com.oracle.ssmphone.mapper.BrandMapper.brandMap"/>
+        <!--多对多关联-->
+        <collection property="colorList" ofType="Color" resultMap="com.oracle.ssmphone.mapper.ColorMapper.colorMap"/>
+        <collection property="labelsList" ofType="Labels" resultMap="com.oracle.ssmphone.mapper.LabelMapper.labelMap"/>
+        <collection property="memoryList" ofType="Memory"
+                    resultMap="com.oracle.ssmphone.mapper.MemoryMapper.memoryMap"/>
+        <!--一对多关联-->
+        <collection property="goodsImgList" ofType="GoodsImg"
+                    resultMap="com.oracle.ssmphone.mapper.GoodsImgMapper.goodsImgMap"/>
+    </resultMap>
+    <resultMap id="goodsMapLazy" type="Goods">
+        <id property="goodsId" column="goods_id" javaType="java.lang.Integer"/>
+        <result property="goodsName" column="goods_name" javaType="java.lang.String"/>
+        <result property="goodsPrice" column="goods_price" javaType="java.lang.Double"/>
+        <result property="goodsImg" column="goods_img" javaType="java.lang.String"/>
+        <result property="goodsIntr" column="goods_intr" javaType="java.lang.String"/>
+        <result property="goodsDesc" column="goods_desc" javaType="java.lang.String"/>
+        <result property="goodsSpec" column="goods_spec" javaType="java.lang.String"/>
+        <result property="goodsPack" column="goods_pack" javaType="java.lang.String"/>
+        <result property="goodsServ" column="goods_serv" javaType="java.lang.String"/>
+        <result property="goodsEval" column="goods_eval" javaType="java.lang.Integer"/>
+        <result property="goodsNum" column="goods_num" javaType="java.lang.Integer"/>
+        <!--按需加载多对一关联类别-->
+        <association property="goodsBrand" select="com.oracle.ssmphone.mapper.BrandMapper.get" column="goods_brand_id"/>
+        <!--按需加载多对多关联-->
+        <collection property="colorList" select="com.oracle.ssmphone.mapper.ColorMapper.findByGoodsId"
+                    column="goods_id"/>
+        <collection property="labelsList" select="com.oracle.ssmphone.mapper.LabelMapper.findByGoodsId"
+                    column="goods_id"/>
+        <collection property="memoryList" select="com.oracle.ssmphone.mapper.MemoryMapper.findByGoodsId"
+                    column="goods_id"/>
+        <!--一对多关联-->
+        <collection property="goodsImgList" select="com.oracle.ssmphone.mapper.GoodsImgMapper.findByGoodsId"
+                    column="goods_id"/>
+    </resultMap>
+    <select id="getLazy" resultMap="goodsMapLazy">
+        select *
+        from goods
+        where goods_id = #{goodsId}
+    </select>
+    <select id="get" resultMap="goodsMap">
+        SELECT g.*, b.*, color.*, gi.*, l.*, m.*
+        FROM goods g
+                 LEFT JOIN brands b ON g.goods_brand_id = b.brand_id
+                 LEFT JOIN goods_color gc ON gc.gc_goods_id = g.goods_id
+                 LEFT JOIN sku_color color ON color.color_id = gc.gc_color_id
+                 LEFT JOIN goods_img gi ON gi.img_goods_id = g.goods_id
+                 LEFT JOIN goods_label gl ON gl.gl_goods_id = g.goods_id
+                 LEFT JOIN labels l ON l.label_id = gl.gl_label_id
+                 LEFT JOIN goods_memory gm ON gm.gm_goods_id = g.goods_id
+                 LEFT JOIN sku_memory m ON m.memory_id = gm.gm_memory_id
+        where g.goods_id = #{goodsId}
+          and g.is_del is null
+    </select>
+    <select id="find" resultMap="goodsMap">
+        select g.*,b.*
+        from goods g
+        left join brands b on g.goods_brand_id = b.brand_id
+            <where>
+            <if test="goodsName!=null and goodsName!=''">
+                and g.goods_name like concat('%',#{goodsName},'%')
+            </if>
+            <if test="brandId!=null">
+                and g.goods_brand_id =#{brandId}
+            </if>
+            <if test="prMin!=null">
+                and g.goods_price &gt;=#{prMin}
+            </if>
+            <if test="prMax!=null and prMax!=-1">
+                and g.goods_price &lt;=#{prMax}
+            </if>
+            <if test="labelId!=null">
+                and g.goods_id IN (SELECT  DISTINCT gl_goods_id FROM goods_label gl WHERE gl.gl_label_id=#{labelId})
+            </if>
+            and g.is_del is null
+        </where>
+
+        order by g.goods_id
+    </select>
+    <!-- //添加商品关联的颜色
+     public void saveGoodsColor(@Param("colorId")Integer colorId, @Param("goodId")Integer goodId);
+     //添加商品关联的标签
+     public void saveGoodsLabel(@Param("labelId")Integer colorId, @Param("goodId")Integer goodId);
+     //添加商品关联内存
+     public void saveGoodsMemory(@Param("memoryId")Integer colorId, @Param("goodId")Integer goodId);-->
+    <insert id="saveWithKey" useGeneratedKeys="true" keyProperty="goodsId" keyColumn="goods_id">
+        INSERT INTO goods(goods_name, goods_price, goods_img, goods_intr, goods_brand_id, goods_desc, goods_spec,
+                          goods_pack, goods_serv, goods_eval, goods_num)
+        VALUES (#{goodsName}, #{goodsPrice}, #{goodsImg}, #{goodsIntr}, #{goodsBrand.brandId}, #{goodsDesc},
+                #{goodsSpec}, #{goodsPack}, #{goodsServ}, #{goodsEval}, #{goodsNum})
+    </insert>
+    <update id="deleteWithLogic">
+        update goods
+        set isDel=0
+        where goods_id = #{goodsId}
+    </update>
+    <insert id="saveGoodsImg">
+        insert into goods_img(img_big, img_small, img_goods_id)
+        values (#{goodsImg.imgBig}, #{goodsImg.imgSmall}, #{goodsId})
+    </insert>
+    <insert id="saveGoodsColor">
+        insert into goods_color
+        values (#{goodId}, #{colorId})
+    </insert>
+    <insert id="saveGoodsLabel">
+        insert into goods_label
+        values (#{goodId}, #{labelId})
+    </insert>
+    <insert id="saveGoodsMemory">
+        insert into goods_memory
+        values (#{goodId}, #{memoryId})
+    </insert>
+</mapper>

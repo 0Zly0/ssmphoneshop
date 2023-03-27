@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.oracle.ssmphone.mapper.MemoryMapper">
+    <!--开启二级缓存-->
+    <cache/>
+    <resultMap id="memoryMap" type="Memory">
+        <id column="memory_id" property="memoryId" javaType="java.lang.Integer"/>
+        <result column="memory_name" property="memoryName" javaType="java.lang.String"/>
+    </resultMap>
+    <select id="find" resultMap="memoryMap">
+        select *
+        from sku_memory m
+        order by m.memory_id
+    </select>
+    <!--对该方法不开启二级缓存-->
+    <select id="findByGoodsId" resultMap="memoryMap" useCache="false">
+        SELECT DISTINCT m.*
+        FROM goods_memory gm
+                 LEFT JOIN sku_memory m
+                           ON gm.gm_memory_id = m.memory_id
+        WHERE gm.gm_goods_id = #{goodsId}
+    </select>
+</mapper>
